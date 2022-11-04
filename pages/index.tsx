@@ -1,11 +1,19 @@
 import Head from 'next/head'
 import Layout, { siteTitle } from '../components/layout'
-import { getSortedPostsData } from "../lib/posts"
+import { supabase } from '../lib/supabase'
 
 type Post = { date: string, title: string, id: string }
 
 export async function getStaticProps() {
-  const allPosts = getSortedPostsData()
+  const { data } = await supabase.from('posts').select()
+
+  const allPosts = (data as any[]).map((datum: any) => {
+    return {
+      id: datum.id,
+      date: datum.created_at,
+      title: datum.title
+    }
+  })
 
   return {
     props: {
